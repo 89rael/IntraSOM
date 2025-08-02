@@ -313,10 +313,23 @@ class SOM(object):
         self.initialization = initialization
         
         if mapsize:
-            if mapsize[1]%2!=0:
-                self.mapsize = (mapsize[0], mapsize[1]+1)
-                print(f"The number of lines cannot be odd.\
-                The map size has been changed to: {self.mapsize}")
+            # ``mapsize`` can be provided as an integer representing the total
+            # number of neurons or as a tuple/list describing the map
+            # dimensions.  The previous implementation assumed a tuple and
+            # attempted to index the value, which raises ``TypeError`` when an
+            # integer is supplied.  Handle both cases by converting integers to
+            # a square map (roughly) and enforcing an even number of rows for
+            # hexagonal lattices.
+            if isinstance(mapsize, int):
+                side = int(np.ceil(np.sqrt(mapsize)))
+                mapsize = (side, side)
+
+            if mapsize[1] % 2 != 0:
+                self.mapsize = (mapsize[0], mapsize[1] + 1)
+                print(
+                    f"The number of lines cannot be odd. "
+                    f"The map size has been changed to: {self.mapsize}"
+                )
             else:
                 self.mapsize = mapsize
         else:
